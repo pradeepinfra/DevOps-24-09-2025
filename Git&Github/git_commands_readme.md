@@ -10,7 +10,7 @@ git --version                         # Check Git version
 git config --global user.name "Your Name"       # Set username
 git config --global user.email "your@email.com" # Set email
 git config --list                      # Show all configs
-git config --global core.editor "code --wait"   # Set default editor (example: VS Code)
+git config --global core.editor "code --wait"   ## Set default editor (example: VS Code)
 ```
 
 ✅ *Tip: Configure your identity before making commits.*
