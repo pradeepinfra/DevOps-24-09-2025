@@ -96,3 +96,73 @@ Think of AWS networking as a **neighborhood**. Each AWS component maps to someth
 - From your machine →  
   ```bash
   ssh -i my-key.pem ec2-user@<BASTION_PUBLIC_IP>
+  ```
+- From Bastion →  
+  ```bash
+  ssh -i my-key.pem ec2-user@10.0.2.x
+  ```
+- On Private EC2 →  
+  ```bash
+  curl -I https://example.com
+  ```
+  ✅ Works via NAT Gateway  
+
+---
+
+## 🧹 Cleanup (Avoid Charges)
+1. Terminate EC2 instances  
+2. Delete NAT Gateway → Release Elastic IP  
+3. Delete `lab-public-rt` and `lab-private-rt`  
+4. Detach & delete `lab-igw`  
+5. Delete subnets  
+6. Delete VPC  
+
+---
+
+## 🏗️ Architecture Diagram
+
+### ASCII View
+```
+                   +------------------------+
+                   |      lab-vpc (10.0.0.0/16)  
+                   |  (Neighborhood Fence)   |
+                   +-------------------------+
+                           |
+                +----------------------+
+                |   Internet Gateway   |
+                |   (Main Gate)        |
+                +----------+-----------+
+                           |
+          -----------------------------------------
+          |                                       |
++----------------------+               +----------------------+
+| lab-public-subnet    |               | lab-private-subnet   |
+| 10.0.1.0/24          |               | 10.0.2.0/24          |
+| (Street: Public)     |               | (Street: Private)    |
++----------+-----------+               +----------+-----------+
+           |                                       |
+   [ Bastion Host ]                         [ Private App ]
+   SG: sg-public                            SG: sg-private
+   (Guard at door)                          (Guard at door)
+           |
+   NAT Gateway (Post Office)  → Outbound Internet Access
+```
+
+### PNG View
+![AWS VPC Diagram](A_2D_digital_diagram_depicts_an_AWS_VPC_architectu.png)
+
+---
+
+## 🔒 Security Group (SG) vs Network ACL (NACL)  
+
+| Feature                | Security Group (SG) | Network ACL (NACL) |
+|-------------------------|---------------------|---------------------|
+| Level of operation      | Instance level      | Subnet level        |
+| Type                   | **Stateful** (return traffic auto-allowed) | **Stateless** (return traffic must be explicitly allowed) |
+| Rules applied to        | Only attached resources (EC2, ENI, etc.) | All resources in the subnet |
+| Default behavior        | Deny all inbound, allow all outbound | Allow all inbound & outbound |
+| Common use              | Protect individual servers | Broad subnet-level filtering |
+
+### Analogy:
+- **Security Group → Guard at each house door** (controls who can enter that specific house).  
+- **NACL → Security gate at the street** (controls traffic for every house on that street).  
