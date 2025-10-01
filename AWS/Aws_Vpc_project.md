@@ -73,42 +73,95 @@ Think of AWS networking as a **neighborhood**. Each AWS component maps to someth
 - Routes → Add `0.0.0.0/0` → Target **NAT Gateway (lab-nat)** → **Save**  
 - Subnet associations → Select `lab-private-subnet`  
 
-### 5) Security Groups
-- **Public SG (`sg-public`)**:  
-  - Inbound: SSH (22) from your IP `/32`  
-  - Outbound: Allow all (default)  
+---
 
-- **Private SG (`sg-private`)**:  
-  - Inbound: SSH (22) from `sg-public` (choose by SG ID)  
-  - Outbound: Allow all (default)  
+## 🔐 Security Groups Setup
 
-### 6) Launch EC2 Instances
-- **Bastion Host (Public Subnet):**  
-  - AMI: Amazon Linux 2 (or Ubuntu), Type: `t3.micro`  
-  - Network: `lab-vpc`, Subnet: `lab-public-subnet`, Auto-assign Public IP → Enable  
-  - SG: `sg-public` → **Launch**  
+### 1) Public Security Group (`sg-public`)
 
-- **Private App Server (Private Subnet):**  
-  - Network: `lab-vpc`, Subnet: `lab-private-subnet`, Auto-assign Public IP → Disable  
-  - SG: `sg-private` → **Launch**  
+For EC2 instances in the **public subnet** (like bastion or test servers).
 
-### 7) Connectivity Test
-- From your machine →  
-  ```bash
-  ssh -i my-key.pem ec2-user@<BASTION_PUBLIC_IP>
-  ```
-- From Bastion →  
-  ```bash
-  ssh -i my-key.pem ec2-user@10.0.2.x
-  ```
-- On Private EC2 →  
-  ```bash
-  curl -I https://example.com
-  ```
-  ✅ Works via NAT Gateway  
+**Create**
+- Go to **VPC → Security Groups → Create security group**
+- Fill:
+  - **Name**: `sg-public`
+  - **Description**: Public SG for EC2 in Public Subnet
+  - **VPC**: Select `lab-vpc`
+
+**Inbound rules**
+- **Rule 1**  
+  - Type: SSH  
+  - Port range: 22  
+  - Source: My IP (`x.x.x.x/32`)  
+
+*(Optional if you plan to host a web app in the public subnet)*  
+- **Rule 2**  
+  - Type: HTTP  
+  - Port range: 80  
+  - Source: `0.0.0.0/0`  
+
+- **Rule 3**  
+  - Type: HTTPS  
+  - Port range: 443  
+  - Source: `0.0.0.0/0`  
+
+**Outbound rules**
+- Leave default (All traffic → `0.0.0.0/0`)
 
 ---
 
+### 2) Private Security Group (`sg-private`)
+
+For EC2 instances in the **private subnet** (like your app or database).
+
+**Create**
+- Go to **VPC → Security Groups → Create security group**
+- Fill:
+  - **Name**: `sg-private`
+  - **Description**: Private SG for EC2 in Private Subnet
+  - **VPC**: Select `lab-vpc`
+
+**Inbound rules**
+- **Rule 1**  
+  - Type: SSH  
+  - Port range: 22  
+  - Source: `sg-public` (choose by SG ID)  
+
+*(Optional if running DB/app inside private subnet)*  
+- **Rule 2**  
+  - Type: MySQL/Aurora (3306) or Custom TCP  
+  - Source: `sg-public` or `sg-private`  
+
+**Outbound rules**
+- Leave default (All traffic → `0.0.0.0/0`)
+
+---
+
+## ✅ Connection Testing
+
+Since you **don’t have a bastion**:
+
+### Option A: Public Subnet Test Server
+- Launch **Ubuntu EC2** in the **public subnet** with `sg-public`.  
+- SSH directly from your laptop:  
+  ```bash
+  ssh -i my-key.pem ubuntu@<PUBLIC_IP>
+  ```
+- From there, test Internet connectivity:  
+  ```bash
+  curl -I https://www.google.com
+  ```
+
+### Option B: Private Subnet EC2 (Using Session Manager)
+- Launch **Ubuntu EC2** in the **private subnet** with `sg-private`.  
+- Attach IAM role with policy: `AmazonSSMManagedInstanceCore`  
+- Go to **EC2 → Connect → Session Manager** → You’ll get shell access.  
+- Inside, test NAT Gateway Internet:  
+  ```bash
+  curl -I https://www.google.com
+  ```
+
+---
 ## 🧹 Cleanup (Avoid Charges)
 1. Terminate EC2 instances  
 2. Delete NAT Gateway → Release Elastic IP  
