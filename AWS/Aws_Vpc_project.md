@@ -18,6 +18,11 @@ It gives you total control over:
 - Internet and private access
 - Security (via SGs and NACLs)
 
+# 🧩 AWS Subnets – Explained Simply
+
+A **subnet (sub-network)** in AWS is a **logical subdivision of a VPC (Virtual Private Cloud)**.  
+It helps organize and control how your resources communicate — internally or externally.
+
 ### 🏗 Example
 If AWS were a big city, **your VPC is your personal gated neighborhood**.  
 You decide who enters, who leaves, and how data moves inside.
