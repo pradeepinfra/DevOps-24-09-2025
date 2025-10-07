@@ -59,7 +59,7 @@ ssh -i oregon-demo-key.pem ec2-user@<Public-IP>
 
 ### Step 1: List block devices
 ```bash
-lsblk
+lsblk              # lsblk stands for List Block Devices. It shows you all storage devices (like hard drives, SSDs, and attached EBS volumes) connected to your Linux system.
 ```
 
 Example output:
