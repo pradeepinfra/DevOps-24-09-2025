@@ -95,3 +95,197 @@ All connect to one **Transit Gateway**, allowing smooth communication between en
 
 🧭 **In short:**  
 > Transit Gateway keeps your AWS network **organized, scalable, and easy to manage**, just like a central bus station keeps city traffic well-connected.
+
+
+
+# AWS Transit Gateway 3-VPC Setup (Manual Project)
+
+## 🧭 Overview
+
+This project demonstrates how to connect **three VPCs** using an **AWS Transit Gateway**. Each VPC will host an EC2 instance, and we’ll verify network connectivity between them.
+
+### Architecture
+
+```
+                +-----------------------------+
+                |        Transit Gateway      |
+                +-------------+---------------+
+                              |
+     +-----------+------------+-----------+
+     |            |            |           |
++----+----+  +----+----+  +----+----+  
+|  VPC-1  |  |  VPC-2  |  |  VPC-3  |  
+|10.0.0.0 |  |11.0.0.0 |  |12.0.0.0 |
++----+----+  +----+----+  +----+----+
+|EC2-1   |  |EC2-2   |  |EC2-3   |
+|10.0.1.10| |11.0.1.10| |12.0.1.10|
++---------+  +---------+  +---------+
+```
+
+---
+
+## ⚙️ Step-by-Step Manual Setup
+
+### Step 1: Create 3 VPCs
+
+Go to **VPC Console → Your VPCs → Create VPC**
+
+| VPC Name | CIDR Block  |
+| -------- | ----------- |
+| VPC-1    | 10.0.0.0/16 |
+| VPC-2    | 11.0.0.0/16 |
+| VPC-3    | 12.0.0.0/16 |
+
+---
+
+### Step 2: Create Subnets
+
+Create one public subnet in each VPC (same Availability Zone).
+
+| VPC   | Subnet Name        | CIDR Block  | AZ         |
+| ----- | ------------------ | ----------- | ---------- |
+| VPC-1 | VPC1-Public-Subnet | 10.0.1.0/24 | us-west-2a |
+| VPC-2 | VPC2-Public-Subnet | 11.0.1.0/24 | us-west-2a |
+| VPC-3 | VPC3-Public-Subnet | 12.0.1.0/24 | us-west-2a |
+
+✅ Enable **Auto-assign Public IPv4** for all.
+
+---
+
+### Step 3: Create and Attach Internet Gateways
+
+Go to **VPC → Internet Gateways → Create Internet Gateway**
+
+| IGW Name | Attach to VPC |
+| -------- | ------------- |
+| IGW-VPC1 | VPC-1         |
+| IGW-VPC2 | VPC-2         |
+| IGW-VPC3 | VPC-3         |
+
+---
+
+### Step 4: Update Route Tables
+
+Each VPC’s main route table → **Edit Routes** → Add:
+
+* Destination: `0.0.0.0/0`
+* Target: Internet Gateway (e.g. IGW-VPC1)
+
+Associate the subnet with that route table.
+
+---
+
+### Step 5: Launch EC2 Instances
+
+Launch **3 EC2 instances**, one per VPC.
+
+| Instance | VPC   | Subnet             | Security Group   |
+| -------- | ----- | ------------------ | ---------------- |
+| EC2-1    | VPC-1 | VPC1-Public-Subnet | Allow SSH + ICMP |
+| EC2-2    | VPC-2 | VPC2-Public-Subnet | Allow SSH + ICMP |
+| EC2-3    | VPC-3 | VPC3-Public-Subnet | Allow SSH + ICMP |
+
+**Security Group Rules:**
+
+* Inbound: SSH (22) from My IP, ICMP (All)
+* Outbound: All traffic allowed
+
+---
+
+### Step 6: Create Transit Gateway
+
+Go to **VPC → Transit Gateways → Create Transit Gateway**
+
+| Setting                         | Value    |
+| ------------------------------- | -------- |
+| Name                            | TGW-Main |
+| Amazon ASN                      | 64512    |
+| DNS Support                     | Enabled  |
+| Default Route Table Association | Enabled  |
+| Default Route Table Propagation | Enabled  |
+
+---
+
+### Step 7: Create Transit Gateway Attachments
+
+Create **3 attachments** linking the TGW with each VPC.
+
+| Attachment Name | VPC   | Subnet             |
+| --------------- | ----- | ------------------ |
+| TGW-VPC1-Attach | VPC-1 | VPC1-Public-Subnet |
+| TGW-VPC2-Attach | VPC-2 | VPC2-Public-Subnet |
+| TGW-VPC3-Attach | VPC-3 | VPC3-Public-Subnet |
+
+---
+
+### Step 8: Update Route Tables (for TGW Routing)
+
+**VPC-1 Route Table:**
+
+```
+11.0.0.0/16 → TGW-Main
+12.0.0.0/16 → TGW-Main
+```
+
+**VPC-2 Route Table:**
+
+```
+10.0.0.0/16 → TGW-Main
+12.0.0.0/16 → TGW-Main
+```
+
+**VPC-3 Route Table:**
+
+```
+10.0.0.0/16 → TGW-Main
+11.0.0.0/16 → TGW-Main
+```
+
+---
+
+### Step 9: Test Connectivity
+
+1. SSH into **EC2-1**
+2. Ping EC2-2 and EC2-3 private IPs
+
+✅ If ping works → Transit Gateway connectivity is successful.
+
+---
+
+### Step 10: Clean Up
+
+To avoid charges:
+
+* Terminate EC2 instances
+* Delete TGW attachments
+* Delete Transit Gateway
+* Delete IGWs and VPCs
+
+---
+
+## 🧰 Summary
+
+| Component       | Count | Description           |
+| --------------- | ----- | --------------------- |
+| VPCs            | 3     | Each with unique CIDR |
+| Subnets         | 3     | Public subnets        |
+| IGWs            | 3     | Internet Gateways     |
+| EC2 Instances   | 3     | Test servers          |
+| Transit Gateway | 1     | Connects all 3 VPCs   |
+| TGW Attachments | 3     | One per VPC           |
+
+---
+
+## ✅ Verification Checklist
+
+* [x] VPCs created and routed correctly
+* [x] EC2 instances launched and reachable
+* [x] Transit Gateway created and attached
+* [x] Routes updated
+* [x] Ping between VPCs successful
+
+---
+
+**Author:** Infravyom IT Technologies 
+**Purpose:** Transit Gateway Connectivity Lab
+
