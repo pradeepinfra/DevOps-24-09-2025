@@ -1,0 +1,134 @@
+# 🪶 AWS S3 Manual End-to-End Project (Root User Guide)
+
+This guide helps you manually create and test **Amazon S3** as the **root user** — step by step.
+
+---
+
+## ☁️ What is S3?
+Amazon **S3 (Simple Storage Service)** is a cloud-based storage system where you can store, access, and manage files such as images, documents, or even host static websites.
+
+---
+
+## 🎯 Objective
+Upload an image manually to S3, make it public, and access it via browser.
+
+---
+
+## 🧰 Prerequisites
+- AWS account (you are using **root user**, so full access is available)
+- Internet browser and an image file (e.g., `photo.jpg`)
+
+---
+
+## 🪜 Step-by-Step Guide
+
+### 🟢 Step 1 — Open S3 Console
+- Login to **AWS Console**
+- Search for **S3** in the top bar
+- Click **Create Bucket**
+
+### 🟢 Step 2 — Create a New Bucket
+| Setting | Example Value |
+|----------|----------------|
+| **Bucket name** | `my-root-demo-bucket` (must be unique) |
+| **Region** | `ap-south-1` (Mumbai) |
+| **Block Public Access** | Uncheck “Block all public access” |
+| **Acknowledgement** | Check warning box |
+| **Versioning** | Optional |
+
+Click **Create bucket**.
+
+---
+
+### 🟢 Step 3 — Upload an Image
+1. Open your new bucket
+2. Click **Upload**
+3. Select your image file (e.g., `photo.jpg`)
+4. Click **Upload**
+
+Your file is now stored in S3.
+
+---
+
+### 🟢 Step 4 — Make It Public
+1. Click on your uploaded image → go to **Permissions**
+2. Under **Access Control List (ACL)** → click **Edit**
+3. In **Public access**, select **Everyone (public)** for “Read” permission
+4. Save changes
+
+✅ The image is now publicly viewable.
+
+---
+
+### 🟢 Step 5 — Copy and Test the Image URL
+1. Copy the **Object URL**, e.g.:
+   ```
+   https://my-root-demo-bucket.s3.ap-south-1.amazonaws.com/photo.jpg
+   ```
+2. Open it in your browser → you should see your image 🎉
+
+---
+
+### 🟢 (Optional) Step 6 — Host a Static Website
+If you upload an HTML file (`index.html`), you can make your bucket a simple website.
+
+**Enable Static Website Hosting:**
+1. Go to **Properties → Static website hosting**
+2. Choose **Enable**
+3. Set **Index document:** `index.html`
+4. Save changes
+
+Now open your website endpoint:
+```
+http://my-root-demo-bucket.s3-website-ap-south-1.amazonaws.com
+```
+
+✅ Your website is live.
+
+---
+
+## 🧾 Example index.html (optional)
+
+```html
+<!DOCTYPE html>
+<html>
+  <head><title>S3 Root User Demo</title></head>
+  <body style="text-align:center; font-family:Arial;">
+    <h1>🚀 Welcome to My S3 Demo Website</h1>
+    <p>This page is hosted from my S3 bucket using the root user.</p>
+    <img src="photo.jpg" width="300" alt="My uploaded image">
+  </body>
+</html>
+```
+
+Upload this `index.html` file along with `photo.jpg` into your bucket.
+
+---
+
+### 🧹 Step 7 — Clean Up
+When finished testing:
+1. Delete files inside the bucket
+2. Delete the bucket
+
+or via CLI:
+```bash
+aws s3 rb s3://my-root-demo-bucket --force
+```
+
+---
+
+## ✅ Summary
+
+| Step | Description |
+|------|--------------|
+| 1 | Create S3 bucket |
+| 2 | Upload image |
+| 3 | Make image public |
+| 4 | Access via browser |
+| 5 | (Optional) Host HTML page |
+
+---
+
+**Author:** AWS Demo by Pradeep  
+**Region Used:** ap-south-1 (Mumbai)  
+**Version:** v1.0  
