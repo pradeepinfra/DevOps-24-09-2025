@@ -125,4 +125,113 @@ You decide who can enter, where the houses (servers) are, and how they connect.
 ### **Step 7: Launch EC2 Instances**
 
 #### Public EC2
-- Subnet: `
+- Subnet: `lab-public-subnet`
+- SG: `sg-public`
+- Public IP: ✅
+- Purpose: Bastion / Web server
+
+#### Private EC2
+- Subnet: `lab-private-subnet`
+- SG: `sg-private`
+- No Public IP
+- Purpose: App / Database server
+
+---
+
+## 🧪 8. Test Everything (End-to-End)
+
+### 1️⃣ Connect to Public EC2
+```bash
+ssh -i my-key.pem ec2-user@<Public-IP>
+```
+✅ Should connect successfully.
+
+---
+
+### 2️⃣ Check Internet from Public EC2
+```bash
+ping -c 4 google.com
+```
+✅ Works (Internet Gateway OK)
+
+---
+
+### 3️⃣ Connect to Private EC2 (from Public EC2)
+```bash
+ssh ec2-user@10.0.2.10
+```
+✅ Works (SG allows access)
+
+---
+
+### 4️⃣ Test Internet from Private EC2
+```bash
+ping -c 4 google.com
+```
+✅ Works via NAT Gateway
+
+---
+
+### 5️⃣ Try to SSH directly from your laptop → private EC2  
+❌ Should **fail** — proves isolation is working.
+
+---
+
+## 🧭 9. Quick Verification Table
+
+| Check | Expected | Status |
+|--------|-----------|--------|
+| Public EC2 → Internet | Works | ✅ |
+| Private EC2 → Internet | Works via NAT | ✅ |
+| SSH Local → Public EC2 | Works | ✅ |
+| SSH Local → Private EC2 | Blocked | ✅ |
+| SSH Public → Private | Works | ✅ |
+| Internet → Private | Blocked | ✅ |
+
+---
+
+## 🧹 10. Cleanup (Optional)
+
+1. Terminate EC2 instances  
+2. Delete NAT Gateway → Release EIP  
+3. Delete Route Tables  
+4. Detach & Delete IGW  
+5. Delete Subnets  
+6. Delete VPC  
+
+---
+
+## 🧠 11. Quick Architecture Recap
+
+```
+Internet
+   |
+[ IGW ]
+   |
+Public Subnet (10.0.1.0/24)
+   |--> EC2: Bastion/Web (Public IP)
+   |
+[ NAT Gateway ]
+   |
+Private Subnet (10.0.2.0/24)
+   |--> EC2: App/DB (No Public IP)
+```
+
+✅ **Public EC2** can reach the internet  
+✅ **Private EC2** can go out via NAT  
+✅ **Private EC2** is not directly reachable from the internet
+
+---
+
+## 🎯 Final Result
+
+You’ve built and tested a **complete AWS VPC** that is:
+- Secure 🔒  
+- Functional 🌐  
+- Beginner-friendly ✅  
+
+---
+
+**Author:** Infravyom IT Technologies  
+**Version:** 2.2 (Simplified Beginner Edition)  
+**Updated:** October 2025  
