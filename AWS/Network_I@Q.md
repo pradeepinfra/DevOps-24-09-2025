@@ -1,4 +1,4 @@
-# Networking & Troubleshooting Interview Questions (42–50)
+# Networking & Troubleshooting Interview Questions
 
 A collection of common networking and troubleshooting questions with simple, clear answers for quick revision.
 
