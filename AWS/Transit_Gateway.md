@@ -1,23 +1,21 @@
 # 🛜 AWS Transit Gateway (TGW) — 2025 Project Guide
 
----
-
 ## 🚀 Overview
 
-**AWS Transit Gateway (TGW)** acts as a **central hub** that connects multiple **VPCs**, **VPNs**, or **on-premises networks** — allowing all of them to communicate efficiently and securely through a single connection.
+**AWS Transit Gateway (TGW)** acts as a **central hub** that connects multiple **VPCs**, **VPNs**, and **on-premises networks** — enabling efficient, secure communication through a single connection.
 
-It eliminates complex **VPC peering meshes** and makes network design **simpler, scalable, and easy to manage**.
+Instead of building complex **VPC peering meshes**, TGW makes your network **simpler, more scalable, and easier to manage**.
 
 ---
 
 ## 🧠 Simple Analogy — *The Central Bus Station 🚌*
 
-Imagine each **VPC** is like a **city** 🏙️.
+Think of each **VPC** as a **city** 🏙️.
 
-- To connect two cities (VPCs), you build a **road** → that’s **VPC Peering**.  
-- But when you have 10+ cities, building roads between every city becomes **complex and costly**.  
+- To connect two cities, you build a **road** → that’s **VPC Peering**.  
+- But when you have 10+ cities, creating roads between all of them becomes **complex** and **expensive**.  
 
-So, instead, you create **one Central Bus Station** — every city connects to it once, and all cities communicate through that hub.  
+So, you build **one Central Bus Station** 🚌 — every city connects to it once, and all cities can communicate via the station.
 
 That **bus station** = **AWS Transit Gateway**.
 
@@ -25,13 +23,13 @@ That **bus station** = **AWS Transit Gateway**.
 
 ## 🧩 AWS Concept Mapping
 
-| Real World Term | AWS Concept | Description |
-|------------------|--------------|--------------|
+| Real World | AWS Concept | Description |
+|-------------|--------------|--------------|
 | City | VPC | Individual AWS network |
-| Road between cities | VPC Peering | One-to-one VPC link |
-| Central Bus Station | Transit Gateway (TGW) | Central connection hub |
-| Road from city to station | TGW Attachment | VPC connection to TGW |
-| Bus routes | TGW Route Tables | Defines traffic flow between VPCs |
+| Road between cities | VPC Peering | One-to-one link between VPCs |
+| Central Bus Station | Transit Gateway (TGW) | Central communication hub |
+| Road to station | TGW Attachment | Connection from VPC to TGW |
+| Bus Routes | TGW Route Tables | Controls how traffic moves between VPCs |
 
 ---
 
@@ -39,17 +37,18 @@ That **bus station** = **AWS Transit Gateway**.
 
 | Benefit | Description |
 |----------|--------------|
-| 🌐 **Centralized Connectivity** | Manage all VPCs from one hub |
-| ⚙️ **Simplified Routing** | One-to-many routing instead of many-to-many |
-| 📈 **Scalability** | Supports thousands of VPCs |
-| 💰 **Cost Efficiency** | Reduces redundant peering and complexity |
-| 🔒 **Security** | Central control of network flow |
+| 🌐 **Centralized Connectivity** | Connect and manage all VPCs via one hub |
+| ⚙️ **Simplified Routing** | One-to-many routing, no peering chaos |
+| 📈 **Highly Scalable** | Supports thousands of VPCs |
+| 💰 **Cost Efficient** | Reduces redundant connections |
+| 🔒 **Secure & Controlled** | Centralized network flow management |
 
 ---
 
 ## 🧭 Project Objective
 
-We’ll create **3 VPCs** and connect them through **one Transit Gateway** to verify **inter-VPC communication** using **EC2 instances**.
+Create **3 VPCs** and connect them through **one Transit Gateway (TGW)**.  
+Then test **inter-VPC communication** using **EC2 instances**.
 
 ---
 
@@ -75,17 +74,17 @@ We’ll create **3 VPCs** and connect them through **one Transit Gateway** to ve
 
 ## ⚙️ Step-by-Step Setup (AWS Console)
 
-### 🧩 Step 1: Create 3 VPCs
+### Step 1️⃣ — Create 3 VPCs
 
-| VPC Name | CIDR Block |
-|-----------|-------------|
+| VPC | CIDR |
+|------|------|
 | VPC-1 | 10.0.0.0/16 |
 | VPC-2 | 11.0.0.0/16 |
 | VPC-3 | 12.0.0.0/16 |
 
 ---
 
-### 🌐 Step 2: Create 1 Subnet per VPC (Public)
+### Step 2️⃣ — Create 1 Public Subnet per VPC
 
 | VPC | Subnet Name | CIDR | AZ |
 |------|--------------|--------|------|
@@ -93,11 +92,11 @@ We’ll create **3 VPCs** and connect them through **one Transit Gateway** to ve
 | VPC-2 | VPC2-Public | 11.0.1.0/24 | us-west-2a |
 | VPC-3 | VPC3-Public | 12.0.1.0/24 | us-west-2a |
 
-✅ Enable **Auto-assign Public IPv4**.
+✅ Enable **Auto-assign Public IP** for each subnet.
 
 ---
 
-### 🌍 Step 3: Create and Attach Internet Gateways
+### Step 3️⃣ — Create Internet Gateways
 
 | IGW | Attach To |
 |------|------------|
@@ -107,32 +106,31 @@ We’ll create **3 VPCs** and connect them through **one Transit Gateway** to ve
 
 ---
 
-### 🧭 Step 4: Update Route Tables
+### Step 4️⃣ — Update Route Tables
 
-For each VPC → Route Table → **Edit Routes**
+For each VPC route table, add:
 
 ```
 Destination: 0.0.0.0/0
-Target: Internet Gateway (IGW of respective VPC)
+Target: Internet Gateway (of respective VPC)
 ```
 
-Then associate your **Public Subnet** with this route table.
-
-✅ This ensures instances can connect to the Internet for SSH and ping tests.
+Associate each **public subnet** with this route table.  
+✅ Allows EC2 instances to access the internet.
 
 ---
 
-### 💻 Step 5: Launch EC2 Instances
+### Step 5️⃣ — Launch EC2 Instances
 
-| Instance | VPC | Subnet | SG Rules |
-|-----------|------|----------|-----------|
+| Instance | VPC | Subnet | Security Group |
+|-----------|------|----------|----------------|
 | EC2-1 | VPC-1 | VPC1-Public | SSH (22), ICMP (All) |
 | EC2-2 | VPC-2 | VPC2-Public | SSH (22), ICMP (All) |
 | EC2-3 | VPC-3 | VPC3-Public | SSH (22), ICMP (All) |
 
 ---
 
-### 🔗 Step 6: Create Transit Gateway
+### Step 6️⃣ — Create Transit Gateway (TGW)
 
 | Setting | Value |
 |----------|--------|
@@ -144,7 +142,7 @@ Then associate your **Public Subnet** with this route table.
 
 ---
 
-### 🧷 Step 7: Create TGW Attachments
+### Step 7️⃣ — Create TGW Attachments
 
 | Attachment | VPC | Subnet |
 |--------------|------|----------|
@@ -154,21 +152,21 @@ Then associate your **Public Subnet** with this route table.
 
 ---
 
-### 🗺️ Step 8: Update Route Tables for TGW Routing
+### Step 8️⃣ — Update TGW Routing Tables
 
-**VPC-1**
+**VPC-1 Routes**
 ```
 11.0.0.0/16 → TGW-Main
 12.0.0.0/16 → TGW-Main
 ```
 
-**VPC-2**
+**VPC-2 Routes**
 ```
 10.0.0.0/16 → TGW-Main
 12.0.0.0/16 → TGW-Main
 ```
 
-**VPC-3**
+**VPC-3 Routes**
 ```
 10.0.0.0/16 → TGW-Main
 11.0.0.0/16 → TGW-Main
@@ -176,21 +174,22 @@ Then associate your **Public Subnet** with this route table.
 
 ---
 
-### 🧪 Step 9: Test Connectivity
+### Step 9️⃣ — Test Connectivity
 
-1. SSH into **EC2-1**
+1. SSH into **EC2-1**  
 2. Run:
    ```bash
    ping 11.0.1.10
    ping 12.0.1.10
    ```
-✅ If ping works — TGW connectivity is successful!
+✅ If ping works — Transit Gateway setup is successful!
 
 ---
 
-### 🧹 Step 10: Clean Up (to avoid charges)
+### Step 🔟 — Clean Up
 
-- Terminate EC2s  
+To avoid charges:
+- Terminate EC2 instances  
 - Delete TGW attachments and TGW  
 - Delete IGWs and VPCs  
 
@@ -198,13 +197,13 @@ Then associate your **Public Subnet** with this route table.
 
 ## 📋 Project Summary
 
-| Component | Count | Description |
-|-------------|--------|----------------|
-| VPCs | 3 | Unique CIDRs |
-| Subnets | 3 | Public |
-| IGWs | 3 | Internet Gateways |
-| EC2 | 3 | Test Instances |
-| TGW | 1 | Central Hub |
+| Resource | Count | Description |
+|-----------|--------|--------------|
+| VPCs | 3 | 10.0.0.0/16, 11.0.0.0/16, 12.0.0.0/16 |
+| Subnets | 3 | Public subnets |
+| IGWs | 3 | Internet gateways |
+| EC2 Instances | 3 | Test servers |
+| TGW | 1 | Central hub |
 | TGW Attachments | 3 | One per VPC |
 
 ---
@@ -212,34 +211,38 @@ Then associate your **Public Subnet** with this route table.
 ## ✅ Verification Checklist
 
 - [x] VPCs created  
+- [x] Subnets and IGWs configured  
 - [x] EC2s deployed  
 - [x] TGW created and attached  
-- [x] Routing updated  
+- [x] Routing configured  
 - [x] Ping success between VPCs  
 
 ---
 
-## 🧩 Real-World Example (2025 Use Case)
+## 🧩 Real-World Use Case (2025)
 
-- **Prod VPC** → Core application servers  
-- **Dev VPC** → Developer environment  
-- **Shared Services VPC** → Monitoring & Logging  
-- **On-Prem VPN** → Corporate network  
+| Environment | Description |
+|--------------|--------------|
+| **Prod VPC** | Core application servers |
+| **Dev VPC** | Developer environment |
+| **Shared Services VPC** | Monitoring, logging, and utilities |
+| **On-Prem VPN** | Corporate datacenter network |
 
-All connected via **AWS Transit Gateway** → centralized, secure, and scalable.
+All connected via **AWS Transit Gateway** — ensuring a **centralized, secure, and scalable** architecture.
 
 ---
 
 ## 📘 Summary
 
-> **Transit Gateway = The Bus Station of AWS Networking.**  
->  
-> Instead of creating dozens of VPC peerings, connect everything once to TGW —  
-> and let AWS handle all the routing automatically.
+> 🚌 **Transit Gateway = The Bus Station of AWS Networking.**  
+> Instead of managing multiple VPC peerings, connect all your networks once to TGW —  
+> and let AWS handle the routing automatically.
 
 ---
 
 ### 🧾 Author
+
 **Infravyom IT Technologies**  
-**By:** Pradeep  
-**Purpose:** AWS Transit Gateway Connectivity Lab (2025 Edition)
+👨‍💻 *By:* Pradeep  
+📅 *Edition:* 2025  
+🎯 *Purpose:* AWS Transit Gateway Connectivity Lab  
