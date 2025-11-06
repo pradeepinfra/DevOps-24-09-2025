@@ -284,6 +284,6 @@ ansible-playbook -i inventory install_nginx.yml
 
 ---
 
-**Author:** AWS & DevOps Learning Notes  
+**Author:** AWS & DevOps Learning Notes  by pradeep
 **Tool:** Ansible 🧩  
 **Platform:** AWS Ubuntu EC2  
