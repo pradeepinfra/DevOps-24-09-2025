@@ -1,86 +1,72 @@
-# 🐧 Linux File Permissions — Complete Guide
+# 🐧 Linux File Permissions — Complete Beginner to Advanced Guide
 
-This guide explains **everything about Linux file permissions** — what they mean, how to change them, and how to read their numeric and symbolic forms.
+This guide explains **everything about Linux file permissions** — what they mean, how to change them, and how to use numeric or symbolic modes.
 
 ---
 
-## 📘 1. What Are File Permissions?
+## 🧩 1. What Are File Permissions?
 
-In Linux, **permissions** determine **who can read, write, or execute** a file or directory.
-
-Each file and directory has **three types of access levels**:
+In Linux, **permissions** decide **who can read, write, or execute** a file or directory.
 
 | User Type | Description |
 |------------|-------------|
-| **Owner (u)** | The person who created the file. |
-| **Group (g)** | Users who belong to the same group as the owner. |
-| **Others (o)** | Everyone else. |
+| **Owner (u)** | The user who created the file |
+| **Group (g)** | Users in the same group as the owner |
+| **Others (o)** | Everyone else |
 
 ---
 
-## 🧩 2. Types of Permissions
+## 🧠 2. Types of Permissions
 
-| Permission | Symbol | Description | Example on File | Example on Directory |
-|-------------|---------|--------------|------------------|----------------------|
-| **Read** | `r` | View or read the contents. | Open or view file. | List contents of directory (`ls`). |
-| **Write** | `w` | Modify contents. | Edit or delete the file. | Create or delete files inside the directory. |
-| **Execute** | `x` | Run file as a program/script. | Run the script. | Enter (`cd`) into the directory. |
+| Permission | Symbol | Meaning | File Example | Directory Example |
+|-------------|---------|----------|----------------|------------------|
+| Read | `r` | View contents | Open a file | List files |
+| Write | `w` | Modify contents | Edit or delete | Create/Delete inside |
+| Execute | `x` | Run the file | Run program | Enter (`cd`) |
 
 ---
 
 ## 🔢 3. Numeric (Octal) Representation
 
-Each permission has a **number value**:
-
-| Permission | Numeric Value |
-|-------------|----------------|
+| Permission | Number |
+|-------------|---------|
 | Read (r) | 4 |
 | Write (w) | 2 |
 | Execute (x) | 1 |
-| No permission (-) | 0 |
 
-You **add them up** to get a total for each user type:
+You add them up for each user type.
 
-Example:
+Examples:
 ```
-rwx = 4 + 2 + 1 = 7  
-rw- = 4 + 2 + 0 = 6  
-r-- = 4 + 0 + 0 = 4
+rwx = 7
+rw- = 6
+r-- = 4
 ```
 
-So permission `rw-r--r--` = `644`
+`rw-r--r--` = 644  
+`rwxr-xr-x` = 755
 
 ---
 
-## 🧮 4. Understanding Permission Structure
+## 🧱 4. Reading Permissions
 
-Example:
+Example output from `ls -l`:
 ```
--rwxr-xr--
+-rwxr-xr-- 1 ubuntu ubuntu 1200 Nov 12 notes.txt
 ```
 
-Breakdown:
+| Part | Meaning |
+|------|----------|
+| `-` | File type (`-` = file, `d` = directory) |
+| `rwx` | Owner permissions |
+| `r-x` | Group permissions |
+| `r--` | Others permissions |
 
-| Position | User Type | Permissions | Meaning |
-|-----------|------------|--------------|----------|
-| 1 | File Type | `-` means file, `d` means directory | File |
-| 2–4 | Owner | `rwx` | Read, write, execute |
-| 5–7 | Group | `r-x` | Read, execute |
-| 8–10 | Others | `r--` | Read only |
-
-**In numeric form:**  
-`rwxr-xr--` → `755`
+So: `rwxr-xr--` = **755**
 
 ---
 
-## 💻 5. Changing Permissions with `chmod`
-
-`chmod` = **change mode**
-
-### ✴️ Syntax:
-```
-chmod [permissions] [filename]
-```
+## 💻 5. Changing Permissions — `chmod`
 
 ### 🔸 Numeric Example:
 ```
@@ -90,25 +76,20 @@ chmod 755 script.sh
 
 ### 🔹 Symbolic Example:
 ```
-chmod u+x myfile.sh     # Add execute permission for user
-chmod g-w myfile.sh     # Remove write permission for group
-chmod o=r myfile.sh     # Set others to read-only
-chmod a+x myfile.sh     # Give execute permission to all (user, group, others)
+chmod u+x file.sh     # Add execute for owner
+chmod g-w file.sh     # Remove write for group
+chmod o=r file.sh     # Others read only
+chmod a+x file.sh     # Everyone execute
 ```
 
 ---
 
-## 🧍 6. Changing Ownership
+## 👑 6. Changing Ownership — `chown` / `chgrp`
 
-Each file has:
-- **Owner**
-- **Group**
-
-### Commands:
 ```
 chown user file.txt          # Change owner
-chown user:group file.txt    # Change both owner and group
-chgrp group file.txt         # Change group only
+chown user:group file.txt    # Change both owner & group
+chgrp group file.txt         # Change only group
 ```
 
 Example:
@@ -118,111 +99,34 @@ chown ubuntu:developers app.py
 
 ---
 
-## 🧱 7. File vs Directory Permissions
+## 📂 7. File vs Directory Permissions
 
-| Type | Read (r) | Write (w) | Execute (x) |
-|------|-----------|------------|-------------|
-| **File** | View contents | Modify contents | Run the file |
-| **Directory** | List files | Create/Delete files | Enter directory |
+| Type | Read | Write | Execute |
+|------|------|--------|----------|
+| File | Open/View | Modify | Run |
+| Directory | List files | Add/Delete files | Enter (`cd`) |
 
 Example:
 ```
-drwxr-x---  myfolder/
-```
-- `d` → Directory  
-- Owner: full access  
-- Group: read & execute  
-- Others: no access  
-
----
-
-## 🧰 8. Common Permission Settings
-
-| Mode | Meaning | Typical Use |
-|------|----------|--------------|
-| `600` | Owner can read/write | Private config files |
-| `644` | Owner can read/write, others read | Common for text files |
-| `700` | Only owner can read/write/execute | Private scripts |
-| `755` | Everyone can read/execute, only owner can write | Common for programs/scripts |
-| `777` | Everyone can read/write/execute | ⚠️ **Not secure**, avoid using unless necessary |
-
----
-
-## 🔍 9. View File Permissions
-
-To check file permissions:
-```
-ls -l
-```
-
-Example output:
-```
--rw-r--r--  1 ubuntu ubuntu  1200 Nov 11 10:00  notes.txt
-```
-
-Breakdown:
-| Field | Description |
-|--------|--------------|
-| `-rw-r--r--` | Permissions |
-| `ubuntu` | Owner |
-| `ubuntu` | Group |
-| `1200` | File size |
-| `notes.txt` | File name |
-
----
-
-## 🧠 10. Shortcut Reference Table
-
-| Symbol | Numeric | Meaning |
-|---------|----------|----------|
-| `rwx` | 7 | Read + Write + Execute |
-| `rw-` | 6 | Read + Write |
-| `r-x` | 5 | Read + Execute |
-| `r--` | 4 | Read only |
-| `-wx` | 3 | Write + Execute |
-| `-w-` | 2 | Write only |
-| `--x` | 1 | Execute only |
-| `---` | 0 | No permissions |
-
----
-
-## 🧩 11. Example Scenarios
-
-### Example 1:
-You have a script `deploy.sh` and want everyone to run it but not edit it:
-```
-chmod 755 deploy.sh
-```
-
-### Example 2:
-You have a config file `secrets.env` that only you should access:
-```
-chmod 600 secrets.env
-```
-
-### Example 3:
-Give group write permission:
-```
-chmod g+w project.txt
+drwxr-x--- myfolder/
 ```
 
 ---
 
-## ✅ 12. Quick Summary
+## 🧮 8. Common Permission Modes
 
-| Command | Purpose |
-|----------|----------|
-| `chmod` | Change permissions |
-| `chown` | Change file owner |
-| `chgrp` | Change file group |
-| `ls -l` | List files with permissions |
-| `umask` | Default permission mask |
+| Mode | Symbol | Meaning | Example Use |
+|------|---------|----------|--------------|
+| 600 | `rw-------` | Only owner read/write | Config files |
+| 644 | `rw-r--r--` | Owner write, others read | Text files |
+| 700 | `rwx------` | Only owner access | Private scripts |
+| 755 | `rwxr-xr-x` | Everyone execute, owner write | Common scripts |
+| 777 | `rwxrwxrwx` | Everyone full access | ⚠️ Not secure |
 
 ---
 
-### 🧭 Example Practice
+## 🧪 9. Practical Example
 
-Create a sample directory and test:
 ```bash
 mkdir test-perms
 cd test-perms
@@ -232,27 +136,49 @@ chmod 700 file2
 ls -l
 ```
 
-Expected output:
+Output:
 ```
--rw-r--r--  file1
--rwx------  file2
+-rw-r--r-- file1
+-rwx------ file2
 ```
 
 ---
 
-## 🎯 Conclusion
+## 🧭 10. Commands Reference
 
-Linux file permissions are **core to system security and management**.  
-Understanding them helps you:
-- Control who can access files.
-- Protect sensitive data.
-- Manage user access safely.
-
-> 🛡️ Tip: Never use `777` unless absolutely required — it gives full control to everyone.
+| Command | Purpose |
+|----------|----------|
+| `ls -l` | Show permissions |
+| `chmod` | Change permissions |
+| `chown` | Change file owner |
+| `chgrp` | Change group |
+| `umask` | Default permission mask |
 
 ---
+
+## ⚠️ 11. Avoid Using `777`
+
+`chmod 777 file.txt` means **everyone** can read, write, execute — unsafe.  
+Use only for temporary testing.
+
+---
+
+## ✅ 12. Summary
+
+| Symbol | Number | Meaning |
+|---------|----------|----------|
+| `rwx` | 7 | Read, Write, Execute |
+| `rw-` | 6 | Read, Write |
+| `r-x` | 5 | Read, Execute |
+| `r--` | 4 | Read only |
+| `---` | 0 | No permissions |
+
+---
+
+### 🎯 Final Tip
+
+> Always keep scripts as **755** and text/config files as **644**.  
+> Avoid **777** unless absolutely required.
 
 **Author:** Pradeep  
-**Topic:** Linux Permissions Simplified  
-**Updated:** November 2025
-
+**Updated:** November 2025  
