@@ -1,4 +1,4 @@
-# 🚀 Setup Terraform for AWS (with Analogies)
+# 🚀 Setup Terraform for AWS
 
 Think of **Terraform** as an engineer who builds your cloud infrastructure.
 
