@@ -1,4 +1,4 @@
-# 🌍 Multi-Region Setup in Terraform (with Analogy)
+# 🌍 Multi-Region Setup in Terraform
 
 Sometimes you need to deploy infrastructure **in more than one AWS region** — for example, one server in **US-East-1** and another in **US-West-2**. Terraform allows this using the **`alias`** keyword.
 
