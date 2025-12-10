@@ -1,4 +1,4 @@
-# 🌱 Terraform `.tfvars` (Simple Explanation)
+# 🌱 Terraform `.tfvars`
 
 ## What is a `.tfvars` file?
 
