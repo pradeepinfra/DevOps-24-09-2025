@@ -1,4 +1,4 @@
-# 🚀 Getting Started with Terraform (Beautiful + Analogies)
+# 🚀 Getting Started with Terraform
 
 Think of **Terraform** as a skilled *construction engineer* who builds your AWS infrastructure exactly the way you draw it on paper.  
 Your Terraform files are the **blueprints**, and AWS is the **land** where everything will be constructed.
