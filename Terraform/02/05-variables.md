@@ -1,4 +1,4 @@
-# 🌱 Terraform Variables – Input & Output (with Simple Analogies)
+# 🌱 Terraform Variables – Input & Output
 
 Think of **Terraform** as an engineer building your cloud setup.
 
