@@ -1,4 +1,4 @@
-# 🌱 Terraform Conditional Expressions (Very Simple Guide)
+# 🌱 Terraform Conditional Expressions
 
 ## What is a Conditional Expression?
 
