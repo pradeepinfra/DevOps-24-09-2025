@@ -1,4 +1,4 @@
-# 🌱 Terraform `.tfvars` – Simple Examples (With Full AWS EC2 Example)
+# 🌱 Terraform `.tfvars` (With Full AWS EC2 Example)
 
 This README explains **Terraform `.tfvars`** in a **very simple and beginner‑friendly way**, including a **complete AWS EC2 example**.
 
@@ -108,8 +108,8 @@ variable "tags" {
 
 ## terraform.tfvars (Answers)
 ```hcl
-region        = "us-east-1"
-ami_id        = "ami-0c55b159cbfafe1f0"
+region        = "us-west2-1"
+ami_id        = "ami-00f46ccd1cbfb363e"
 instance_type = "t2.micro"
 
 tags = {
