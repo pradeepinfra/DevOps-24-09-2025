@@ -334,6 +334,185 @@ output "existing_arn" {
 
 ---
 
+# 🔥 Scenario-Based Terraform Interview Questions (Interview Ready)
+
+This README covers **real-world Terraform scenarios**, clear explanations, real commands, and **one-line interview answers**.
+Use this as a **quick revision guide or interview cheat sheet**.
+
+---
+
+## ✔ What this README contains
+
+✔ Scenario-based Terraform interview questions  
+✔ Clear, simple explanations  
+✔ Real Terraform commands (`init`, `import`, `migrate-state`)  
+✔ Interview-ready one-line answers  
+
+---
+
+## 1️⃣ Terraform State Lock Error
+
+### Interview Question
+Two engineers run `terraform apply` at the same time. Terraform throws a **state lock error**. How do you fix it?
+
+### Explanation
+- Terraform state file is shared
+- Multiple users try to update it simultaneously
+- This can corrupt infrastructure
+
+### Solution (Best Practice)
+Use:
+- **S3 backend** → remote state storage
+- **DynamoDB** → state locking
+
+### Example
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state-bucket"
+    key            = "dev/terraform.tfstate"
+    region         = "ap-south-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}
+```
+
+### One-Line Interview Answer
+> We use S3 backend with DynamoDB locking to avoid concurrent state modification.
+
+---
+
+## 2️⃣ Manual AWS Resource Deletion (Drift)
+
+### Interview Question
+Someone manually deleted an EC2 instance from AWS Console. What happens when Terraform runs?
+
+### Explanation
+- Terraform state still contains the resource
+- Actual AWS resource is missing
+- This is called **Infrastructure Drift**
+
+### Terraform Behavior
+```bash
+terraform plan
+```
+Terraform detects the drift and **recreates the resource**.
+
+### One-Line Interview Answer
+> Terraform detects drift during plan and recreates the deleted resource.
+
+---
+
+## 3️⃣ Accidental `terraform destroy`
+
+### Interview Question
+A teammate ran `terraform destroy` by mistake. How do you recover?
+
+### Explanation
+- All resources are deleted
+- Terraform state is updated
+
+### Recovery Strategy
+Enable **S3 Versioning** on the backend bucket.
+
+### Recovery Steps
+1. Restore the previous `terraform.tfstate` version from S3
+2. Run:
+```bash
+terraform init
+terraform apply
+```
+
+### One-Line Interview Answer
+> We recover by restoring the previous Terraform state from S3 versioning.
+
+---
+
+## 4️⃣ Move from Local State to Remote State
+
+### Interview Question
+Terraform uses local state. Team wants remote backend. How do you migrate?
+
+### Solution Command
+```bash
+terraform init -migrate-state
+```
+
+### Explanation
+Moves local `terraform.tfstate` to remote backend (S3).
+
+### One-Line Interview Answer
+> We migrate Terraform state using `terraform init -migrate-state`.
+
+---
+
+## 5️⃣ Multiple Environments (dev / test / prod)
+
+### Interview Question
+How do you manage multiple environments using the same Terraform code?
+
+### Best Practice
+- Same Terraform code
+- Different `.tfvars` files
+- Separate backend state paths
+
+### Folder Structure
+```
+terraform/
+│── main.tf
+│── variables.tf
+│── dev.tfvars
+│── prod.tfvars
+```
+
+### Apply Commands
+```bash
+terraform apply -var-file=dev.tfvars
+terraform apply -var-file=prod.tfvars
+```
+
+### One-Line Interview Answer
+> We use separate tfvars files and backend keys for each environment.
+
+---
+
+## 6️⃣ Import Existing AWS Infrastructure
+
+### Interview Question
+Infrastructure already exists in AWS. How do you manage it using Terraform?
+
+### Solution
+```bash
+terraform import aws_instance.my_ec2 i-0abcd1234efgh5678
+```
+
+### Important Notes
+- Import updates **Terraform state only**
+- Terraform configuration must be written manually
+
+### One-Line Interview Answer
+> We use terraform import to bring existing resources under Terraform management.
+
+---
+
+## 🎯 One-Line Interview Summary Table
+
+| Scenario | Answer |
+|--------|--------|
+| State Lock | S3 + DynamoDB |
+| Manual Deletion | Drift detected & recreated |
+| Accidental Destroy | Restore S3 state |
+| Local → Remote | terraform init -migrate-state |
+| Multiple Environments | tfvars + backend |
+| Existing Infra | terraform import |
+
+---
+
+## ✅ Final Interview Tip
+
+> Terraform **state management** is more important than writing resources.
+
 📘 **Author:** Pradeep’s Terraform Notes  
 🕓 **Last Updated:** November 2025  
 ✨ Perfect for interviews, learning, or Terraform project documentation.
