@@ -1,0 +1,16 @@
+echo "===== Set Java Environment ====="
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+
+echo "===== Verify Java ====="
+java --version
+javac --version
+
+echo "===== Move to project directory ====="
+cd Jenkins || exit 1
+
+echo "===== Compile Java file ====="
+javac HelloWorld.java
+
+echo "===== Run Java program ====="
+java HelloWorld
