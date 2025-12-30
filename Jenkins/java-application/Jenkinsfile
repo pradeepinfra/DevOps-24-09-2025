@@ -1,0 +1,249 @@
+# 🌱 Java CI/CD Beginner Project – Step-by-Step Guide (Java 21)
+
+This project demonstrates a simple Java 21 application and explains each step clearly to build, test, containerize, and automate it using Maven, Docker, Jenkins, and GitHub.
+
+---
+
+## 🛠 Prerequisites
+
+- Java 21  
+- Maven 3.x  
+- Docker  
+- Git  
+- Jenkins (with Docker access)
+
+Verify:
+```bash
+java --version
+mvn --version
+docker --version
+git --version
+```
+
+---
+
+## 📌 Step 1: Create Project Folder
+
+```bash
+mkdir java-application
+cd java-application
+```
+
+Why:  
+Creates a root folder to keep Java, Maven, Docker, and Jenkins files together.
+
+---
+
+## 📌 Step 2: Create Maven Directory Structure
+
+```bash
+mkdir -p src/main/java/com/message
+mkdir -p src/test/java/com/message
+```
+
+Why:  
+Maven requires this standard structure to identify application and test code.
+
+---
+
+## 📂 Project Structure
+
+```
+java-application/
+│── src/
+│   ├── main/java/com/message/MessageApp.java
+│   └── test/java/com/message/MessageAppTest.java
+│── pom.xml
+│── Dockerfile
+│── docker-compose.yml
+│── Jenkinsfile
+│── README.md
+```
+
+---
+
+## 📌 Step 3: Java Application
+
+```java
+package com.message;
+
+public class MessageApp {
+
+    public static String getMessage() {
+        return "Learning DevOps step by step makes life easier!";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getMessage());
+    }
+}
+```
+
+---
+
+## 📌 Step 4: Unit Test
+
+```java
+package com.message;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class MessageAppTest {
+
+    @Test
+    void verifyMessage() {
+        assertEquals(
+            "Learning DevOps step by step makes life easier!",
+            MessageApp.getMessage()
+        );
+    }
+}
+```
+
+---
+
+## 📌 Step 5: Maven Build File
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.message</groupId>
+  <artifactId>java-application</artifactId>
+  <version>1.0</version>
+
+  <properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.9.3</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.message.MessageApp</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+```
+
+---
+
+## 📌 Step 6: Build & Test
+
+```bash
+mvn clean package
+```
+
+---
+
+## 📌 Step 7: Run Locally
+
+```bash
+java -jar target/java-application-1.0.jar
+```
+
+---
+
+## 📌 Step 8: Dockerfile
+
+```dockerfile
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY target/java-application-1.0.jar app.jar
+CMD ["java","-jar","app.jar"]
+```
+
+---
+
+## 📌 Step 9: Docker Run
+
+```bash
+docker build -t java-message-app .
+docker run --rm java-message-app
+```
+
+---
+
+## 📌 Step 10: Docker Compose
+
+```yaml
+version: '3'
+services:
+  message-app:
+    image: java-message-app
+```
+
+```bash
+docker-compose up --build
+docker-compose down
+```
+
+---
+
+## 📌 Step 11: Jenkins Pipeline
+
+```groovy
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven-3'
+    }
+
+    stages {
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t java-message-app .'
+            }
+        }
+        stage('Docker Run') {
+            steps {
+                sh 'docker run --rm java-message-app'
+            }
+        }
+    }
+}
+```
+
+---
+
+## 📌 Step 12: GitHub Push
+
+```bash
+git init
+git add .
+git commit -m "Java CI/CD beginner project"
+git branch -M main
+git remote add origin <repo-url>
+git push -u origin main
+```
+
+---
+
+## 📜 License
+
+By pradeep
