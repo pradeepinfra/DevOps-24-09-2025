@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('lable_name') {
             steps {
                 sh 'echo "Hello World"'
             }
