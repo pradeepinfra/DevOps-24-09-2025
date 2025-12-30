@@ -1,214 +1,178 @@
-# 🌱 Java CI/CD Beginner Project – Step by Step Guide
+# 🌱 Java CI/CD Pipeline with Jenkins, Maven & Docker (Beginner Friendly)
 
-This project demonstrates a **very simple Java application** and explains **each step clearly** to build, test, containerize, and automate it using Maven, Docker, and Jenkins.
-
----
-
-## 📌 Step 1: Create Project Folder
-
-```bash
-mkdir java-application
-cd java-application
-```
-
-**Why:**  
-Creates a root folder to keep Java, Docker, and Jenkins files together.
+This project demonstrates a **complete end-to-end CI/CD pipeline** using **Git, Maven, Jenkins, and Docker**.
+Each step is explained clearly so even **absolute beginners** can understand **what happens and why**.
 
 ---
 
-## 📌 Step 2: Create Maven Directory Structure
+## 📌 What This Project Does
 
-```bash
-mkdir -p src/main/java/com/message
-mkdir -p src/test/java/com/message
-```
-
-**Why:**  
-Maven expects this standard structure for source code and tests.
+- Cleans Jenkins workspace
+- Pulls Java code from GitHub
+- Builds and tests the application using Maven
+- Packages the Java application
+- Builds a Docker image
+- Tags and pushes the image to Docker Hub
+- Cleans workspace after pipeline completion
 
 ---
 
 ## 📂 Project Structure
 
 ```
-java-application/
-│── src/
-│   ├── main/java/com/message/MessageApp.java
-│   └── test/java/com/message/MessageAppTest.java
-│── pom.xml
-│── Dockerfile
-│── docker-compose.yml
-│── Jenkinsfile
-│── README.md
+DevOps-24-09-2025/
+└── Jenkins/
+    └── java-application/
+        ├── src/
+        │   ├── main/java/com/message/MessageApp.java
+        │   └── test/java/com/message/MessageAppTest.java
+        ├── pom.xml
+        ├── Dockerfile
+        ├── Jenkinsfile
+        └── README.md
 ```
 
 ---
 
-## 📌 Step 3: Java Application
-
-**MessageApp.java**
-```java
-package com.message;
-
-public class MessageApp {
-
-    public static String getMessage() {
-        return "Learning DevOps step by step makes life easier!";
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getMessage());
-    }
-}
-```
-
-**Why:**  
-Simple logic makes CI/CD easy to understand.
-
----
-
-## 📌 Step 4: Unit Test
-
-**MessageAppTest.java**
-```java
-package com.message;
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class MessageAppTest {
-
-    @Test
-    void verifyMessage() {
-        assertEquals(
-            "Learning DevOps step by step makes life easier!",
-            MessageApp.getMessage()
-        );
-    }
-}
-```
-
-**Why:**  
-Ensures code correctness before Docker/Jenkins steps.
-
----
-
-## 📌 Step 5: Maven Build File
-
-**pom.xml**
-```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.message</groupId>
-  <artifactId>java-application</artifactId>
-  <version>1.0</version>
-
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>5.9.3</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-</project>
-```
-
----
-
-## 📌 Step 6: Build & Test
-
-```bash
-mvn clean package
-```
-
-**Result:**  
-Creates JAR file in `target/` directory.
-
----
-
-## 📌 Step 7: Run Locally
-
-```bash
-java -jar target/java-application-1.0.jar
-```
-
----
-
-## 📌 Step 8: Dockerfile
-
-```dockerfile
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
-COPY target/java-application-1.0.jar app.jar
-CMD ["java","-jar","app.jar"]
-```
-
----
-
-## 📌 Step 9: Docker Run
-
-```bash
-docker build -t java-message-app .
-docker run --rm java-message-app
-```
-
----
-
-## 📌 Step 10: Docker Compose
-
-```yaml
-version: '3'
-services:
-  message-app:
-    image: java-message-app
-```
-
-```bash
-docker-compose up --build
-docker-compose down
-```
-
----
-
-## 📌 Step 11: Jenkins Pipeline
+## 🧹 Stage 1: Clean Workspace (Before Build)
 
 ```groovy
-pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps { sh 'mvn clean package' }
-        }
-        stage('Docker') {
-            steps { sh 'docker build -t java-message-app .' }
-        }
-        stage('Run') {
-            steps { sh 'docker run --rm java-message-app' }
-        }
+cleanWs()
+```
+
+Removes old files from previous builds to avoid conflicts.
+
+---
+
+## 📥 Stage 2: Git Checkout
+
+```groovy
+git branch: 'main',
+    url: 'https://github.com/pradeepinfra/DevOps-24-09-2025.git'
+```
+
+Pulls latest code from GitHub.
+
+---
+
+## 🧱 Stage 3: Maven Clean
+
+```bash
+mvn clean
+```
+
+Deletes old compiled files.
+
+---
+
+## 🛠 Stage 4: Compile
+
+```bash
+mvn compile
+```
+
+Compiles Java source code.
+
+---
+
+## 🧪 Stage 5: Test
+
+```bash
+mvn test
+```
+
+Runs unit tests.
+
+---
+
+## 📦 Stage 6: Package
+
+```bash
+mvn package
+```
+
+Creates deployable JAR file.
+
+---
+
+## 🐳 Stage 7: Docker Build
+
+```bash
+docker build -t java-jenkins-docker:latest .
+```
+
+Builds Docker image.
+
+---
+
+## 🏷 Stage 8: Docker Tag
+
+```bash
+docker tag java-jenkins-docker:latest infravyom/java-app:v1
+```
+
+Tags image for Docker Hub.
+
+---
+
+## 🔐 Stage 9: Docker Login (Learning Purpose)
+
+```bash
+docker login -u infravyom -p ******
+```
+
+Authenticates Docker Hub.
+
+---
+
+## 🚀 Stage 10: Docker Push
+
+```bash
+docker push infravyom/java-app:v1
+```
+
+Pushes image to Docker Hub.
+
+---
+
+## 🧹 Post Action: Clean Workspace (After Build)
+
+```groovy
+post {
+    always {
+        cleanWs()
     }
 }
 ```
 
+Cleans workspace after build.
+
 ---
 
-## 📌 Step 12: GitHub Push
+## ✅ Complete CI/CD Flow
 
-```bash
-git init
-git add .
-git commit -m "Java CI/CD beginner project"
-git branch -M main
-git remote add origin <repo-url>
-git push -u origin main
+```
+Clean Workspace
+→ Git Checkout
+→ Maven Clean
+→ Compile
+→ Test
+→ Package
+→ Docker Build
+→ Docker Tag
+→ Docker Login
+→ Docker Push
+→ Clean Workspace
 ```
 
 ---
 
-## 📜 License
-MIT License
+## 🎯 Real-World Best Practices
+
+- Store Jenkinsfile in Git
+- Store artifacts in Nexus/S3
+- Store Docker images in Docker Hub/ECR
+- Jenkins should be rebuildable anytime
+
+---
+
