@@ -1,4 +1,4 @@
-#hello this is to test webhook trigger
+//hello this is to test webhook trigger
 
 pipeline {
     agent any
