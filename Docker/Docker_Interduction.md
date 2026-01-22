@@ -301,24 +301,129 @@ docker run -it ubuntu bash
 
 ## ✅ 14. Volumes (Persistent Storage)
 
-### Create volume
-```bash
-docker volume create mydata
-```
+# ✅ Docker Volumes (Persistent Storage) — Notes & Commands
 
-### Run container with volume
+## 🔹 What is a Docker Volume?
+A **Docker Volume** is Docker-managed storage used to **persist data** (save data permanently) outside the container lifecycle.
+
+✅ Even if the container is deleted or recreated, the volume data remains safe.
+
+---
+
+## ✅ When to Use Docker Volumes in Real-Time Projects
+Use volumes when your application needs **permanent data storage**:
+
+### ✅ 1) Databases (Most Common)
+- MySQL / PostgreSQL / MongoDB
+
+📌 Example: store DB data permanently
 ```bash
 docker run -d --name db -v mydata:/var/lib/mysql mysql
 ```
 
+### ✅ 2) App Uploads
+- User uploaded files (images, pdfs, documents)
+```bash
+docker run -d --name app -v uploads:/app/uploads myapp-image
+```
+
+### ✅ 3) Logs Storage
+- Keep logs safe even if container restarts
+```bash
+docker run -d --name app -v applogs:/var/log/app myapp-image
+```
+
+### ✅ 4) Production Containers
+- Containers restart often during deployments
+- Volumes help keep your important data safe
+
 ---
 
-## ✅ 15. Bind Mount (Local folder)
+# ✅ Most Used Docker Volume Commands
+
+## ✅ 1) Create a Volume
 ```bash
-docker run -it -v $(pwd):/app ubuntu bash
+docker volume create mydata
 ```
 
 ---
+
+## ✅ 2) List Volumes
+```bash
+docker volume ls
+```
+
+---
+
+## ✅ 3) Inspect a Volume (Find actual storage path)
+```bash
+docker volume inspect mydata
+```
+
+Example output includes:
+- **Mountpoint**: `/var/lib/docker/volumes/mydata/_data`
+
+---
+
+## ✅ 4) Run a Container with Volume (MySQL Example)
+```bash
+docker run -d --name db -v mydata:/var/lib/mysql mysql
+```
+
+### 🔍 Explanation
+| Part | Meaning |
+|------|---------|
+| `-d` | Run container in background |
+| `--name db` | Container name = `db` |
+| `-v mydata:/var/lib/mysql` | Attach volume `mydata` to MySQL data directory |
+| `mysql` | MySQL image |
+
+✅ Database data will be stored inside volume `mydata`
+
+---
+
+## ✅ 5) Simple Volume Test (Ubuntu Example)
+### Step 1: Run Ubuntu with volume
+```bash
+docker run -it --name test1 -v mydata:/data ubuntu
+```
+
+### Step 2: Create a file inside container
+```bash
+echo "hello docker volume" > /data/file1.txt
+exit
+```
+
+### Step 3: Remove the container
+```bash
+docker rm test1
+```
+
+### Step 4: Run new container using same volume
+```bash
+docker run -it --name test2 -v mydata:/data ubuntu
+cat /data/file1.txt
+```
+
+✅ You will still see the file → volume data is persistent 🎉
+
+---
+
+## ✅ 6) Remove a Volume (⚠️ Deletes all data permanently)
+```bash
+docker volume rm mydata
+```
+
+---
+
+# ⭐ Quick Interview Rule
+✅ **Use Volumes for persistent data** (DB, uploads, logs, production)  
+❌ **Don’t use Volumes for temporary data**
+
+---
+
+✅ End of Docker Volumes Notes ✅
+
 
 ## ✅ 16. Networks
 List networks:
