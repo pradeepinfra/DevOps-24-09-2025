@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vote App</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 70px;
+        }
+        button{
+            padding: 12px 25px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .yes{background: green; color: white; border: none;}
+        .no{background: red; color: white; border: none;}
+        .box{
+            display: inline-block;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 300px;
+        }
+        a{display:block; margin-top: 20px;}
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h1>✅ Vote Flask App</h1>
+        <p><b>Question:</b> Do you like Docker?</p>
+
+        <form method="POST">
+            <button class="yes" type="submit" name="vote" value="YES">👍 YES</button>
+            <button class="no" type="submit" name="vote" value="NO">👎 NO</button>
+        </form>
+
+        <h2>📊 Results</h2>
+        <p>YES: <b>{{ votes["YES"] }}</b></p>
+        <p>NO: <b>{{ votes["NO"] }}</b></p>
+        <p>Total Votes: <b>{{ total }}</b></p>
+
+        <a href="/reset">🔄 Reset Votes</a>
+    </div>
+
+</body>
+</html>
