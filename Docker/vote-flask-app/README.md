@@ -212,4 +212,20 @@ This project stores votes in **memory**, so if container restarts votes become *
 
 ---
 
-✅ Done 🎉
+# ✅ Push Docker Image to Docker Hub
+
+```bash
+docker login
+docker tag vote-flask-app pradeepdevops/vote-flask-app:1.0
+docker push pradeepdevops/vote-flask-app:1.0
+```
+
+Run anywhere:
+```bash
+docker run -d -p 5000:5000 pradeepdevops/vote-flask-app:1.0
+```
+
+---
+
+# ⚠️ Note
+Votes reset on container restart. Use DB in real projects.
