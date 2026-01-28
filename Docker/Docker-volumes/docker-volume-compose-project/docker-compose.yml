@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  app:
+    image: ubuntu
+    container_name: volume_demo_app
+    command: sleep infinity
+    volumes:
+      - mydata:/data
+
+volumes:
+  mydata:
