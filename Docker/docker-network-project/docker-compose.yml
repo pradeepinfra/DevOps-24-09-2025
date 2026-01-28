@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  web:
+    image: nginx
+    container_name: web_app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/usr/share/nginx/html
+    networks:
+      - my-network
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
