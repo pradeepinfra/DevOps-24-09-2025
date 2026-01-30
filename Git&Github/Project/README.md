@@ -1,4 +1,4 @@
-# 🚀 Git & GitHub Demo Project
+# 🚀 Git & GitHub Demo Project-1
 
 A simple project to learn **Git** and **GitHub** basics.  
 
