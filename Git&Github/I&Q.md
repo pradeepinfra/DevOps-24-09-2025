@@ -371,4 +371,16 @@ breaking the main code.
 
 ------------------------------------------------------------------------
 
+📌 Important Branch Names
+
+Common branches:
+
+main or master → Production-ready code
+
+develop → Integration branch
+
+feature branches → New features
+
+hotfix branches → Urgent fixes
+
 Happy Learning 🚀
