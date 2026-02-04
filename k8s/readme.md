@@ -34,25 +34,30 @@ nano vote-deployment.yaml
 Add the following configuration:
 
 ``` yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1          # Kubernetes API version for Deployment resource
+kind: Deployment             # Resource type we are creating (Deployment)
+
 metadata:
-  name: vote-app
+  name: vote-app             # Name of the deployment
+
 spec:
-  replicas: 2
-  selector:
+  replicas: 2                # Number of pod copies to run
+
+  selector:                  # How deployment finds pods it manages
     matchLabels:
-      app: vote-app
-  template:
+      app: vote-app          # Must match pod labels below
+
+  template:                  # Template used to create pods
     metadata:
       labels:
-        app: vote-app
+        app: vote-app        # Label applied to pods
+
     spec:
-      containers:
-      - name: vote-app
-        image: infravyom/vote-flask-app:1.1
+      containers:            # Container details inside pod
+      - name: vote-app       # Container name
+        image: infravyom/vote-flask-app:1.1  # Docker image from Docker Hub
         ports:
-        - containerPort: 80
+        - containerPort: 80  # Container listens on port 80
 ```
 
 Save and exit.
