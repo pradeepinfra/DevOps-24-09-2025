@@ -21,145 +21,321 @@ minikube status
 kubectl get nodes
 ```
 
+# Kubernetes Vote App Demo --- Step-by-Step Guide
+
+This README provides a complete **step-by-step explanation** of
+deploying and demonstrating an application on Kubernetes.
+
+It is designed for: - Learning Kubernetes - Demo presentations -
+Interviews - Hands-on practice
+
+The demo covers:
+
+-   Application deployment
+-   Service exposure
+-   Browser access
+-   Pod scaling
+-   Rolling updates
+-   Self-healing
+-   Autoscaling
+
 ------------------------------------------------------------------------
 
-## Step 1 --- Create Deployment File
+# Step 1 --- Architecture Overview
 
-Create a file:
+Application flow:
 
-``` bash
-nano vote-deployment.yaml
-```
+User Browser ↓ NodePort / Port Forward ↓ Kubernetes Service ↓ Deployment
+↓ Pods ↓ Container (Flask App)
 
-Add the following configuration:
+Kubernetes ensures application availability even if pods fail.
+
+------------------------------------------------------------------------
+
+# Step 2 --- Application Details
+
+Application: Flask Vote App\
+Docker Image: `infravyom/vote-flask-app:1.1`\
+Application Port: **5000**
+
+------------------------------------------------------------------------
+
+# Step 3 --- Deployment YAML
+
+Deployment creates and manages pods.
 
 ``` yaml
-apiVersion: apps/v1          # Kubernetes API version for Deployment resource
-kind: Deployment             # Resource type we are creating (Deployment)
-
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: vote-app             # Name of the deployment
-
+  name: vote-app
 spec:
-  replicas: 2                # Number of pod copies to run
-
-  selector:                  # How deployment finds pods it manages
+  replicas: 2
+  selector:
     matchLabels:
-      app: vote-app          # Must match pod labels below
-
-  template:                  # Template used to create pods
+      app: vote-app
+  template:
     metadata:
       labels:
-        app: vote-app        # Label applied to pods
-
+        app: vote-app
     spec:
-      containers:            # Container details inside pod
-      - name: vote-app       # Container name
-        image: infravyom/vote-flask-app:1.1  # Docker image from Docker Hub
+      containers:
+      - name: vote-app
+        image: infravyom/vote-flask-app:1.1
         ports:
-        - containerPort: 80  # Container listens on port 80
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 200m
 ```
 
-Save and exit.
+Deployment ensures pods are always running.
 
 ------------------------------------------------------------------------
 
-## Step 2 --- Deploy Application
+# Step 4 --- Service YAML
 
-Apply deployment:
+Service exposes pods inside or outside cluster.
 
-``` bash
-kubectl apply -f vote-deployment.yaml
+``` yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote-app-service
+spec:
+  type: NodePort
+  selector:
+    app: vote-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+    nodePort: 30007
 ```
 
-Check pods:
+Traffic flow:
+
+Browser → NodePort → Service → Pods
+
+------------------------------------------------------------------------
+
+# Step 5 --- Deploy Application
+
+Apply resources:
+
+``` bash
+kubectl apply -f vote-app.yaml
+kubectl apply -f vote-app-service.yaml
+```
+
+Verify:
 
 ``` bash
 kubectl get pods
-```
-
-------------------------------------------------------------------------
-
-## Step 3 --- Expose Application
-
-Create a service:
-
-``` bash
-kubectl expose deployment vote-app --type=NodePort --port=80
-```
-
-Check service details:
-
-``` bash
 kubectl get svc
 ```
 
-------------------------------------------------------------------------
-
-## Step 4 --- Access Application
-
-Open service in browser:
-
-``` bash
-minikube service vote-app
-```
-
-Or manually:
-
-``` bash
-minikube ip
-```
-
-Open in browser:
-
-    http://<minikube-ip>:<nodeport>
+Pods must be **Running**.
 
 ------------------------------------------------------------------------
 
-## Useful Commands
+# Step 6 --- Access Application
 
-Scale application:
+Open browser:
+
+    http://<SERVER-IP>:30007
+
+Ensure firewall/security group allows port **30007**.
+
+------------------------------------------------------------------------
+
+# Step 7 --- Port Forward (Optional)
+
+Alternative method:
+
+``` bash
+kubectl port-forward svc/vote-app-service 8090:80 --address 0.0.0.0
+```
+
+Access:
+
+    http://SERVER-IP:8090
+
+Run in background:
+
+``` bash
+nohup kubectl port-forward svc/vote-app-service 8090:80 --address 0.0.0.0 > pf.log 2>&1 &
+```
+
+------------------------------------------------------------------------
+
+# Step 8 --- Scaling Demo
+
+Increase replicas:
 
 ``` bash
 kubectl scale deployment vote-app --replicas=4
 ```
 
-View pods:
+Verify:
 
 ``` bash
-kubectl get pods -o wide
+kubectl get pods
 ```
 
-Delete deployment:
+Application continues running without downtime.
+
+------------------------------------------------------------------------
+
+# Step 9 --- Rolling Update Demo
+
+Restart deployment:
 
 ``` bash
-kubectl delete deployment vote-app
+kubectl rollout restart deployment vote-app
 ```
 
-Delete service:
+Pods update gradually without affecting users.
+
+------------------------------------------------------------------------
+
+# Step 10 --- Self-Healing Demo
+
+Delete a pod:
 
 ``` bash
-kubectl delete svc vote-app
+kubectl delete pod <pod-name>
+```
+
+Watch recreation:
+
+``` bash
+kubectl get pods -w
+```
+
+Kubernetes automatically creates a new pod.
+
+------------------------------------------------------------------------
+
+# Step 11 --- Enable Metrics Server
+
+Autoscaling requires metrics server.
+
+``` bash
+minikube addons enable metrics-server
+```
+
+Verify:
+
+``` bash
+kubectl top nodes
 ```
 
 ------------------------------------------------------------------------
 
-## Architecture Flow
+# Step 12 --- Create Autoscaler
 
-User → Service → Pods → Container
+``` bash
+kubectl autoscale deployment vote-app --cpu=20% --min=2 --max=6
+```
 
-Deployment manages replicas and ensures application availability.
+Check:
 
-------------------------------------------------------------------------
-
-## Summary
-
--   Docker image is pulled from Docker Hub.
--   Deployment creates pods.
--   Service exposes the application.
--   Minikube runs Kubernetes locally.
+``` bash
+kubectl get hpa
+```
 
 ------------------------------------------------------------------------
 
-Happy Learning Kubernetes 🚀
+# Step 13 --- Generate Load
+
+Create load generator:
+
+``` bash
+kubectl run -i --tty load-generator --rm --image=busybox -- /bin/sh
+```
+
+Inside container:
+
+``` bash
+while true; do wget -q -O- http://vote-app-service; done
+```
+
+Watch scaling:
+
+``` bash
+kubectl get hpa -w
+kubectl get pods
+```
+
+Pods increase automatically.
+
+------------------------------------------------------------------------
+
+# Step 14 --- Stop Load
+
+Stop load:
+
+``` bash
+kubectl delete pod load-generator
+```
+
+Pods scale down after a few minutes.
+
+------------------------------------------------------------------------
+
+# Step 15 --- Demo Explanation Points
+
+You can explain:
+
+• Deployment manages application pods\
+• Service exposes application\
+• Pods auto-recover on failure\
+• Rolling updates avoid downtime\
+• Autoscaling adjusts pods automatically
+
+------------------------------------------------------------------------
+
+# Step 16 --- Common Issues
+
+## App not reachable
+
+Check:
+
+``` bash
+kubectl get svc
+kubectl get pods
+```
+
+## Autoscaling not working
+
+Ensure CPU requests defined.
+
+## Port-forward stops
+
+Restart port-forward or use NodePort.
+
+------------------------------------------------------------------------
+
+# Step 17 --- Final Demo Flow
+
+1.  Show pods running
+2.  Access application
+3.  Scale pods
+4.  Delete pod
+5.  Rolling restart
+6.  Autoscaling demo
+
+------------------------------------------------------------------------
+
+# Conclusion
+
+This demo proves Kubernetes provides:
+
+-   Scalability
+-   High availability
+-   Automatic recovery
+-   Zero-downtime deployment
 
